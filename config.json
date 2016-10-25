@@ -1,0 +1,5 @@
+{
+    'secret': "xxx",
+    'databaseURL': "https://kipr-391be.firebaseio.com",
+    'urlDBName': "/saving-data/users/"
+}
