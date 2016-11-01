@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const firebase = require("firebase");
 const config = require("./../config.json");
 
-// input real parameters for db
 firebase.initializeApp({
     serviceAccount: config.serviceAccount,
     databaseURL: config.databaseURL
@@ -30,11 +29,9 @@ app.use(function(req, res, next) {
 });
 
 app.get("/", function(req, res, next) {
-    // Handle the get for this route
 });
 
 app.post("/", function(req, res, next) {
-    // Handle the post for this route
 });
 
 // for action on button click
