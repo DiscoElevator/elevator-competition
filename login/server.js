@@ -23,6 +23,11 @@ function writeUserData(userId, name, img) {
     });
 }
 
+var getShortToken = function (req) {
+    var token = jwt.encode(req.body.name, config.secret);
+    return token.substr(token.length - 20, 15);
+};
+
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 app.use(urlencodedParser);
@@ -42,8 +47,7 @@ app.post("/", function(req, res, next) {
 // for action on button click Login
 app.post("/login", function (req, res) {
     if (!req.body || !req.body.name) return res.sendStatus(400);
-    var token = jwt.encode(req.body.name, config.secret);
-    var shortToken = token.substr(token.length - 20, 15); // = userID
+    var shortToken = getShortToken(req); // = userID
     ref.orderByChild("username").equalTo(req.body.name).once("value", function(snapshot) {
         if (snapshot.val()) {
             res.status(403).send("Authentication failed. User already exist.");
@@ -70,8 +74,7 @@ app.post("/check", function (req, res) {
 
 app.post("/avatar", function(req, res) {
     if (!req.body || !req.body.img || !req.body.name) return res.sendStatus(400);
-    var token = jwt.encode(req.body.name, config.secret);
-    var shortToken = token.substr(token.length - 20, 15);
+    var shortToken = getShortToken(req);
     ref.orderByChild("username").equalTo(req.body.name).once("value", function(snapshot) {
         if (snapshot.val()) {
             writeUserData(shortToken, req.body.name, req.body.img);
