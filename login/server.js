@@ -11,12 +11,22 @@ firebase.initializeApp({
 const db = firebase.database();
 const ref = db.ref(config.urlDBName);
 
-function writeUserData(userId, name) {
+function writeUserName(userId, name) {
     db.ref(config.urlDBName + userId).set({
         username: name
-        //profile_picture : imageUrl
     });
 }
+function writeUserData(userId, name, img) {
+    db.ref(config.urlDBName + userId).set({
+        username: name,
+        avatar: img
+    });
+}
+
+var getShortToken = function (req) {
+    var token = jwt.encode(req.body.name, config.secret);
+    return token.substr(token.length - 20, 15);
+};
 
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
@@ -34,17 +44,16 @@ app.get("/", function(req, res, next) {
 app.post("/", function(req, res, next) {
 });
 
-// for action on button click
+// for action on button click Login
 app.post("/login", function (req, res) {
     if (!req.body || !req.body.name) return res.sendStatus(400);
-    var token = jwt.encode(req.body.name, config.secret);
-    var shortToken = token.substr(token.length - 20, 15); // = userID
+    var shortToken = getShortToken(req); // = userID
     ref.orderByChild("username").equalTo(req.body.name).once("value", function(snapshot) {
         if (snapshot.val()) {
             res.status(403).send("Authentication failed. User already exist.");
         }
         else {
-            writeUserData (shortToken, req.body.name);
+            writeUserName (shortToken, req.body.name);
             res.status(200).send(shortToken);
         }
     });
@@ -59,6 +68,20 @@ app.post("/check", function (req, res) {
         }
         else {
             res.status(200).send("OK");
+        }
+    });
+});
+
+app.post("/avatar", function(req, res) {
+    if (!req.body || !req.body.img || !req.body.name) return res.sendStatus(400);
+    var shortToken = getShortToken(req);
+    ref.orderByChild("username").equalTo(req.body.name).once("value", function(snapshot) {
+        if (snapshot.val()) {
+            writeUserData(shortToken, req.body.name, req.body.img);
+            res.status(200).send("Avatar OK");
+        }
+        else {
+            res.status(403).send("It is strange!");
         }
     });
 });
