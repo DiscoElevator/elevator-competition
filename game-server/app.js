@@ -45,6 +45,7 @@ function socketHandler(socket) {
 
 function emitScoreChange(scores) {
 	io.emit("scores_changed", scores);
+	console.log(scores);
 }
 
 function updateUserScore(token, score) {
@@ -55,6 +56,7 @@ function getScores() {
 	return usersRef.orderByChild("score").once("value")
 		.then(data => data.val())
 		.then(objectToArray)
+        .then(users => users.map(getUserScore))
 		.catch(console.error);
 
 	function objectToArray(obj) {
@@ -64,6 +66,13 @@ function getScores() {
 		});
 		return result;
 	}
+
+	function getUserScore(user) {
+	    return {
+	        username: user.username,
+            score: user.score
+        };
+    }
 }
 
 function calculateScore(data) {

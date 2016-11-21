@@ -1,8 +1,7 @@
 {
   "secret": "xxx",
-  "serviceAccount": "./KiPr-2352086b109e.json",
-  "databaseURL": "https://kipr-391be.firebaseio.com",
-  "urlDBName": "/saving-data/users/",
-  "loginServerPort": 8080,
+  "databaseURL": "https://elevatorcompetition.firebaseio.com/",
+  "urlDBName": "/users/",
+  "loginServerPort": 3002,
   "gameServerPort": 8090
 }

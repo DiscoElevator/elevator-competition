@@ -86,6 +86,6 @@ app.post("/avatar", function(req, res) {
     });
 });
 
-app.listen(3002, function () {
+app.listen(config.loginServerPort, function () {
     console.log("App listening on port 3002!");
 });

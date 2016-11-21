@@ -5,7 +5,7 @@
   "main": "config.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:login": "node login/app.js",
+    "start:login": "node login/server.js",
     "start:game": "node game-server/app.js",
     "start": "run-p start:login start:game"
   },
