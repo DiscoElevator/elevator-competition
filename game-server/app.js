@@ -42,6 +42,12 @@ function socketHandler(socket) {
 			.then(getScores)
 			.then(emitScoreChange);
 	});
+	socket.on("get_scores", () => {
+		logger.info("Results board connected");
+        getScores().then(scores => {
+            socket.emit("scores_changed", scores);
+		});
+	});
 
     function sendNewScoreToUser(score) {
         socket.emit("user_score", {
@@ -73,7 +79,7 @@ function getScores() {
 	return usersRef.orderByChild("score").once("value")
 		.then(data => data.val())
 		.then(objectToArray)
-        // .then(users => users.map(getUserScore))
+        .then(users => users.map(getUserScore))
 		.catch(logger.error);
 
 	function objectToArray(obj) {
@@ -86,12 +92,14 @@ function getScores() {
 
 	function getUserScore(user) {
 	    return {
-	        username: user.username,
-            score: user.score
+	        name: user.username,
+			points: user.score,
+			level: user.level,
+			avatar: user.avatar
         };
     }
 }
 
 function calculateScore(data) {
-	return 0;
+	return data.level * 10;
 }
