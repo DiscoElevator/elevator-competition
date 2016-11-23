@@ -22,10 +22,10 @@ io.on("connection", socketHandler);
 
 function socketHandler(socket) {
 	socket.on("user_connected", token => {
-		logger.info(token);
 		usersRef.child(token).once("value")
 			.then(data => data.val())
 			.then(user => {
+                logger.info(`User connected: token=${token}, name=${user.username}`);
 				return initializeUser(token, user);
 			}).then(user => {
                 sendNewScoreToUser(user.score);
@@ -35,6 +35,7 @@ function socketHandler(socket) {
 	});
 	socket.on("challenge_completed", userData => {
 		let score = calculateScore(userData.data);
+		logger.info(`User has completed challenge: token=${userData.token} level=${userData.data.level} score=${score}`);
         sendNewScoreToUser(score);
 		let newLevel = userData.data.level + 1;
 		updateUserData(userData.token, score, newLevel)
@@ -51,7 +52,6 @@ function socketHandler(socket) {
 
 function emitScoreChange(scores) {
 	io.emit("scores_changed", scores);
-	console.log("change: ", scores);
 }
 
 function updateUserData(token, score, level) {
@@ -73,8 +73,8 @@ function getScores() {
 	return usersRef.orderByChild("score").once("value")
 		.then(data => data.val())
 		.then(objectToArray)
-        .then(users => users.map(getUserScore))
-		.catch(console.error);
+        // .then(users => users.map(getUserScore))
+		.catch(logger.error);
 
 	function objectToArray(obj) {
 		let result = [];

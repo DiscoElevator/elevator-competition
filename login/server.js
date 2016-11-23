@@ -55,6 +55,7 @@ app.post("/login", function (req, res) {
         } else {
             writeUserName(shortToken, req.body.name).then(function() {
                 res.status(200).send(shortToken);
+                logger.info(`New user: token=${shortToken} name=${req.body.name}`);
             });
         }
     });
