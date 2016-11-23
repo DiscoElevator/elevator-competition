@@ -18,12 +18,15 @@ const usersRef = db.ref(config.urlDBName);
 io.on("connection", socketHandler);
 
 function socketHandler(socket) {
+    // socket.emit("user_score", {
+    //     score: 100
+    // });
 	socket.on("user_connected", token => {
-		console.log('ready');
 		usersRef.child(token).once("value")
 			.then(data => data.val())
-			.then(user => {initializeUser(token, user)})
 			.then(user => {
+				return initializeUser(token, user);
+			}).then(user => {
                 sendNewScoreToUser(user.score);
 				// recalculate positions and notify users
 				getScores().then(emitScoreChange);
@@ -34,7 +37,6 @@ function socketHandler(socket) {
         sendNewScoreToUser(score);
 		let newLevel = userData.data.level + 1;
 		updateUserData(userData.token, score, newLevel)
-			.then()
 			.then(getScores)
 			.then(emitScoreChange);
 	});
@@ -60,7 +62,7 @@ function initializeNewUser(token) {
 }
 function initializeUser(token, user) {
     if (user.score === undefined) {
-        return initializeNewUser(token);
+        return initializeNewUser(token).then(() => {return user;});
     } else {
         return Promise.resolve(user);
     }
