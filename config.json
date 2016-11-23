@@ -3,5 +3,10 @@
   "databaseURL": "https://elevatorcompetition.firebaseio.com/",
   "urlDBName": "/users/",
   "loginServerPort": 3002,
-  "gameServerPort": 8090
+  "gameServerPort": 8090,
+  "logger": {
+    "level": "info",
+    "timestampFormat": "YYYY-MM-DD HH:mm:ss.SSS",
+    "logDirectory": "./../logs"
+  }
 }

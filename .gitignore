@@ -3,3 +3,4 @@ build
 node_modules
 .idea/
 game-server/node_modules
+logs/*.log

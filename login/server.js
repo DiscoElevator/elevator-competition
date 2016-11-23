@@ -3,6 +3,9 @@ const jwt = require("jwt-simple");
 const bodyParser = require("body-parser");
 const firebase = require("firebase");
 const config = require("./../config.json");
+const LoggerFactory = require("./../utils/logger");
+
+const logger = LoggerFactory.createLogger(config, "LoginServer");
 
 firebase.initializeApp({
     serviceAccount: config.serviceAccount,
@@ -84,5 +87,5 @@ app.post("/avatar", function(req, res) {
 });
 
 app.listen(config.loginServerPort, function () {
-    console.log(`Login server started on port: ${config.loginServerPort}`);
+    logger.info(`Login server started on port: ${config.loginServerPort}`);
 });

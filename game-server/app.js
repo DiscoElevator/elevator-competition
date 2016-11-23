@@ -4,9 +4,12 @@ const app = require("http").createServer();
 const io = require("socket.io")(app);
 const firebase = require("firebase");
 const config = require("./../config.json");
+const LoggerFactory = require("./../utils/logger");
+
+const logger = LoggerFactory.createLogger(config, "GameServer");
 
 app.listen(config.gameServerPort, () => {
-	console.log(`Game server started on port: ${config.gameServerPort}`)
+	logger.info(`Game server started on port: ${config.gameServerPort}`);
 });
 
 firebase.initializeApp({
@@ -18,10 +21,8 @@ const usersRef = db.ref(config.urlDBName);
 io.on("connection", socketHandler);
 
 function socketHandler(socket) {
-    // socket.emit("user_score", {
-    //     score: 100
-    // });
 	socket.on("user_connected", token => {
+		logger.info(token);
 		usersRef.child(token).once("value")
 			.then(data => data.val())
 			.then(user => {
