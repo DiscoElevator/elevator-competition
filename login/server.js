@@ -9,17 +9,15 @@ firebase.initializeApp({
     databaseURL: config.databaseURL
 });
 const db = firebase.database();
-const ref = db.ref(config.urlDBName);
+const usersRef = db.ref(config.urlDBName);
 
 function writeUserName(userId, name) {
-    db.ref(config.urlDBName + userId).set({
-        username: name
-    });
+    return writeUserData(userId, name, null);
 }
-function writeUserData(userId, name, img) {
-    db.ref(config.urlDBName + userId).set({
+function writeUserData(userId, name, avatar) {
+    return usersRef.child(userId).update({
         username: name,
-        avatar: img
+        avatar: avatar
     });
 }
 
@@ -48,13 +46,13 @@ app.post("/", function(req, res, next) {
 app.post("/login", function (req, res) {
     if (!req.body || !req.body.name) return res.sendStatus(400);
     var shortToken = getShortToken(req); // = userID
-    ref.orderByChild("username").equalTo(req.body.name).once("value", function(snapshot) {
+    usersRef.orderByChild("username").equalTo(req.body.name).once("value", function(snapshot) {
         if (snapshot.val()) {
             res.status(403).send("Authentication failed. User already exist.");
-        }
-        else {
-            writeUserName (shortToken, req.body.name);
-            res.status(200).send(shortToken);
+        } else {
+            writeUserName(shortToken, req.body.name).then(function() {
+                res.status(200).send(shortToken);
+            });
         }
     });
 });
@@ -62,11 +60,10 @@ app.post("/login", function (req, res) {
 // for check real-time input name (only error response)
 app.post("/check", function (req, res) {
     if (!req.body) return res.sendStatus(400);
-    ref.orderByChild("username").equalTo(req.body.name).once("value", function(snapshot) {
+    usersRef.orderByChild("username").equalTo(req.body.name).once("value", function(snapshot) {
         if (snapshot.val()) {
             res.status(403).send("User already exist.");
-        }
-        else {
+        } else {
             res.status(200).send("OK");
         }
     });
@@ -75,17 +72,17 @@ app.post("/check", function (req, res) {
 app.post("/avatar", function(req, res) {
     if (!req.body || !req.body.img || !req.body.name) return res.sendStatus(400);
     var shortToken = getShortToken(req);
-    ref.orderByChild("username").equalTo(req.body.name).once("value", function(snapshot) {
+    usersRef.orderByChild("username").equalTo(req.body.name).once("value", function(snapshot) {
         if (snapshot.val()) {
-            writeUserData(shortToken, req.body.name, req.body.img);
-            res.status(200).send("Avatar OK");
-        }
-        else {
+            writeUserData(shortToken, req.body.name, req.body.img).then(function() {
+                res.status(200).send("Avatar OK");
+            });
+        } else {
             res.status(403).send("It is strange!");
         }
     });
 });
 
 app.listen(config.loginServerPort, function () {
-    console.log("App listening on port 3002!");
+    console.log(`Login server started on port: ${config.loginServerPort}`);
 });

@@ -5,7 +5,9 @@ const io = require("socket.io")(app);
 const firebase = require("firebase");
 const config = require("./../config.json");
 
-app.listen(config.gameServerPort);
+app.listen(config.gameServerPort, () => {
+	console.log(`Game server started on port: ${config.gameServerPort}`)
+});
 
 firebase.initializeApp({
 	databaseURL: config.databaseURL
@@ -16,40 +18,52 @@ const usersRef = db.ref(config.urlDBName);
 io.on("connection", socketHandler);
 
 function socketHandler(socket) {
-	socket.on("ready", token => {
+	socket.on("user_connected", token => {
+		console.log('ready');
 		usersRef.child(token).once("value")
 			.then(data => data.val())
+			.then(user => {initializeUser(token, user)})
 			.then(user => {
-				if (user.score === undefined) {
-					return updateUserScore(token, 0);
-				} else {
-					return user;
-				}
-			})
-			.then(user => {
-				socket.emit("user_score", {
-					username: user.username,
-					score: user.score
-				});
+                sendNewScoreToUser(user.score);
 				// recalculate positions and notify users
 				getScores().then(emitScoreChange);
 			});
 	});
 	socket.on("challenge_completed", userData => {
 		let score = calculateScore(userData.data);
-		updateUserScore(userData.token, score)
+        sendNewScoreToUser(score);
+		let newLevel = userData.data.level + 1;
+		updateUserData(userData.token, score, newLevel)
+			.then()
 			.then(getScores)
 			.then(emitScoreChange);
 	});
+
+    function sendNewScoreToUser(score) {
+        socket.emit("user_score", {
+            score: score
+        });
+    }
 }
 
 function emitScoreChange(scores) {
 	io.emit("scores_changed", scores);
-	console.log(scores);
+	console.log("change: ", scores);
 }
 
-function updateUserScore(token, score) {
-	return usersRef.child(token).update({score});
+function updateUserData(token, score, level) {
+	return usersRef.child(token).update({score, level});
+}
+
+function initializeNewUser(token) {
+	return updateUserData(token, 0, 1);
+}
+function initializeUser(token, user) {
+    if (user.score === undefined) {
+        return initializeNewUser(token);
+    } else {
+        return Promise.resolve(user);
+    }
 }
 
 function getScores() {
