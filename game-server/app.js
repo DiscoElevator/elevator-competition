@@ -31,7 +31,7 @@ function socketHandler(socket) {
                 sendNewScoreToUser(user.score);
 				// recalculate positions and notify users
 				getScores().then(emitScoreChange);
-			});
+			}).catch(logger.error);
 	});
 	socket.on("challenge_completed", userData => {
 		let score = calculateScore(userData.data);
@@ -65,7 +65,7 @@ function updateUserData(token, score, level) {
 }
 
 function initializeNewUser(token) {
-	return updateUserData(token, 0, 1);
+	return updateUserData(token, 0, 0);
 }
 function initializeUser(token, user) {
     if (user.score === undefined) {
@@ -84,7 +84,7 @@ function getScores() {
 
 	function objectToArray(obj) {
 		let result = [];
-		Object.keys(obj).forEach(key => {
+		Object.keys(obj || {}).forEach(key => {
 			result.push(obj[key]);
 		});
 		return result;
