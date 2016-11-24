@@ -29,14 +29,14 @@ function socketHandler(socket) {
 				return initializeUser(token, user);
 			}).then(user => {
                 sendNewScoreToUser(user.score);
-				// recalculate positions and notify users
+				// recalculate scores and notify users
 				getScores().then(emitScoreChange);
 			}).catch(logger.error);
 	});
 	socket.on("challenge_completed", userData => {
 		let score = calculateScore(userData.data);
 		logger.info(`User has completed challenge: token=${userData.token} level=${userData.data.level} score=${score}`);
-        sendNewScoreToUser(score);
+        // sendNewScoreToUser(score);
 		let newLevel = userData.data.level + 1;
 		updateUserData(userData.token, score, newLevel)
 			.then(getScores)
@@ -65,7 +65,7 @@ function updateUserData(token, score, level) {
 }
 
 function initializeNewUser(token) {
-	return updateUserData(token, 0, 0);
+	return updateUserData(token, 0, 1);
 }
 function initializeUser(token, user) {
     if (user.score === undefined) {

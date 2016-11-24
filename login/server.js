@@ -73,6 +73,17 @@ app.post("/check", function (req, res) {
     });
 });
 
+app.get("/users/:token", function (req, res) {
+    if (!req.params.token) return res.sendStatus(400);
+    usersRef.child(req.params.token).once("value", function(snapshot) {
+        if (snapshot.val()) {
+            res.status(200).json(snapshot.val());
+        } else {
+            res.status(200).json(null);
+        }
+    });
+});
+
 app.post("/avatar", function(req, res) {
     if (!req.body || !req.body.img || !req.body.name) return res.sendStatus(400);
     var shortToken = getShortToken(req);
