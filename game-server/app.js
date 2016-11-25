@@ -34,13 +34,18 @@ function socketHandler(socket) {
 			}).catch(logger.error);
 	});
 	socket.on("challenge_completed", userData => {
-		let score = calculateScore(userData.data);
-		logger.info(`User has completed challenge: token=${userData.token} level=${userData.data.level} score=${score}`);
-        // sendNewScoreToUser(score);
-		let newLevel = userData.data.level + 1;
-		updateUserData(userData.token, score, newLevel)
-			.then(getScores)
-			.then(emitScoreChange);
+		let calculatedScore = calculateScore(userData.data);
+		usersRef.child(userData.token).once("value")
+            .then(data => data.val())
+			.then(user => {
+				const score = user.score + calculatedScore;
+                logger.info(`User has completed challenge: token=${userData.token} level=${userData.data.level} levelScore=${calculatedScore} score=${score} data=${JSON.stringify(userData.data)}`);
+                // sendNewScoreToUser(score);
+                let newLevel = userData.data.level + 1;
+                updateUserData(userData.token, score, newLevel)
+                    .then(getScores)
+                    .then(emitScoreChange);
+			});
 	});
 	socket.on("get_scores", () => {
 		logger.info("Results board connected");
