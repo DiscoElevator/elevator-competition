@@ -38,6 +38,7 @@ function socketHandler(socket) {
 		usersRef.child(userData.token).once("value")
             .then(data => data.val())
 			.then(user => {
+				console.log(calculatedScore);
 				const score = user.score + calculatedScore;
                 logger.info(`User has completed challenge: token=${userData.token} level=${userData.data.level} levelScore=${calculatedScore} score=${score} data=${JSON.stringify(userData.data)}`);
                 // sendNewScoreToUser(score);
@@ -109,7 +110,7 @@ function calculateScore(data) {
 	const condition = initCondition(data.condition);
 	const timeLimitScores = calculateScoreForConditions(condition.timeLimit, data.elapsedTime);
 	const maxWaitTimeScores = calculateScoreForConditions(condition.maxWaitTime, data.waitTime);
-	const moveLimitScores = calculateScoreForConditions(condition.moveLimit, data.moveCount);
+	const moveLimitScores = calculateScoreForConditions(condition.moveLimit, data.moves);
 	return timeLimitScores + maxWaitTimeScores + moveLimitScores;
 
 	function calculateScoreForConditions(condition, result) {
