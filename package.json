@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:login": "node login/server.js",
     "start:game": "node game-server/app.js",
-    "start": "run-p start:login start:game"
+    "start:content": "node content.js",
+    "start:dev": "run-p start:login start:game",
+    "start": "run-p start:login start:game start:content"
   },
   "repository": {
     "type": "git",

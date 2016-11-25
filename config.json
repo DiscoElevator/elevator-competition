@@ -4,6 +4,7 @@
   "urlDBName": "/users/",
   "loginServerPort": 3002,
   "gameServerPort": 8090,
+  "contentServerPort": 8080,
   "logger": {
     "level": "info",
     "timestampFormat": "YYYY-MM-DD HH:mm:ss.SSS",

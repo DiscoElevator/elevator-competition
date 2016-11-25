@@ -39,11 +39,11 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.get("/", function(req, res, next) {
-});
-
-app.post("/", function(req, res, next) {
-});
+// app.get("/", function(req, res, next) {
+// });
+//
+// app.post("/", function(req, res, next) {
+// });
 
 // for action on button click Login
 app.post("/login", function (req, res) {
