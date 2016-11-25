@@ -38,7 +38,6 @@ function socketHandler(socket) {
 		usersRef.child(userData.token).once("value")
             .then(data => data.val())
 			.then(user => {
-				console.log(calculatedScore);
 				const score = user.score + calculatedScore;
                 logger.info(`User has completed challenge: token=${userData.token} level=${userData.data.level} levelScore=${calculatedScore} score=${score} data=${JSON.stringify(userData.data)}`);
                 // sendNewScoreToUser(score);
