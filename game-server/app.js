@@ -101,5 +101,24 @@ function getScores() {
 }
 
 function calculateScore(data) {
-	return data.level * 10;
+	const condition = initCondition(data.condition);
+	const timeLimitScores = calculateScoreForConditions(condition.timeLimit, data.elapsedTime);
+	const maxWaitTimeScores = calculateScoreForConditions(condition.maxWaitTime, data.waitTime);
+	const moveLimitScores = calculateScoreForConditions(condition.moveLimit, data.moveCount);
+	return timeLimitScores + maxWaitTimeScores + moveLimitScores;
+
+	function calculateScoreForConditions(condition, result) {
+		if (!condition) {
+			return 0;
+		}
+		return data.level * condition - result;
+	}
+}
+
+function initCondition(condition) {
+	return {
+		timeLimit: condition.timeLimit || 0,
+		maxWaitTime: condition.maxWaitTime || 0,
+		moveLimit: condition.moveLimit || 0
+	};
 }
